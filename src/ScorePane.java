@@ -47,13 +47,13 @@ public class ScorePane extends Pane {
 				double elapsedTime = (now - lastNanos) / 1_000_000.0 / 1_000.0;
 				lastNanos = now;
 
-//				if (scoreBox.getHeight() < getHeight()) {
-//					//No need to scroll
-//					scoreBox.setLayoutY(0);
-//				} else {
-				scoreBox.setLayoutY(scoreBox.getLayoutY() - 60 * elapsedTime);
-				if (scoreBox.getLayoutY() < -scoreBox.getHeight() + scoreLabel.getHeight())
+				if (scoreBox.getChildren().isEmpty()) {
 					scoreBox.setLayoutY(getHeight());
+				} else {
+					scoreBox.setLayoutY(scoreBox.getLayoutY() - 60 * elapsedTime);
+					if (scoreBox.getLayoutY() < -scoreBox.getHeight() + scoreLabel.getHeight())
+						scoreBox.setLayoutY(getHeight());
+				}
 			}
 		}.start();
 

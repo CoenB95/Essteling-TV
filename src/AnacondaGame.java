@@ -5,6 +5,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.paint.Color;
@@ -46,17 +47,19 @@ public class AnacondaGame extends GamePane {
 		ft.setToValue(1);
 
 		TranslateTransition tt = new TranslateTransition(Duration.seconds(10), imageView);
-		tt.toXProperty().bind(widthProperty().subtract(image.widthProperty()));
 		tt.setAutoReverse(true);
 		tt.setCycleCount(TranslateTransition.INDEFINITE);
 		//Wait for the image to finish loading
 		image.widthProperty().addListener((v1, v2, v3) -> {
 			System.out.println("Image loaded");
+			tt.setFromX(0);
+			tt.toXProperty().bind(widthProperty().subtract(image.widthProperty()));
 			ft.playFromStart();
 			tt.playFromStart();
 		});
+		widthProperty().addListener((v1, v2, v3) -> tt.playFromStart());
 
-		Label scoreLabel = new Label("Topscores:");
+		Label scoreLabel = new Label(getAttractionName());
 		scoreLabel.setFont(Font.font("Roboto Thin", 100));
 		scoreLabel.setTextFill(Color.WHITE);
 		scoreLabel.layoutXProperty().bind(widthProperty().divide(2).subtract(scoreLabel.widthProperty().divide(2)));

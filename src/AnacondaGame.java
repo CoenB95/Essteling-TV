@@ -1,6 +1,7 @@
 import javafx.animation.AnimationTimer;
 import javafx.animation.FadeTransition;
 import javafx.animation.TranslateTransition;
+import javafx.beans.binding.Bindings;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
@@ -37,7 +38,7 @@ public class AnacondaGame extends GamePane {
 	private ScorePane scoreBoxYearly;
 
 	public AnacondaGame() {
-		super("Araconda");
+		super("Anaconda");
 
 		Image backgroundImage = new Image("/snake_background2.png", true);
 		ImageView backgroundImageView = new ImageView(backgroundImage);
@@ -60,7 +61,7 @@ public class AnacondaGame extends GamePane {
 		});
 		widthProperty().addListener((v1, v2, v3) -> tt.playFromStart());
 
-		Label scoreLabel = new Label("Anaconda");
+		Label scoreLabel = new Label(getAttractionName());
 		scoreLabel.setFont(Font.font("Roboto Thin", 100));
 		scoreLabel.setTextFill(Color.WHITE);
 		scoreLabel.layoutXProperty().bind(widthProperty().divide(2).subtract(scoreLabel.widthProperty().divide(2)));
@@ -73,20 +74,23 @@ public class AnacondaGame extends GamePane {
 
 		progressFade = new FadeTransition(Duration.millis(400), progressBar);
 
-		scoreBoxDaily = createScorePane("Top dag:", 0.01, 0.01, 0.38, 0.38);
-		scoreBoxWeekly = createScorePane("Top week:", 0.01, 0.61, 0.38, 0.38);
-		scoreBoxMonthly = createScorePane("Top maand:", 0.61, 0.01, 0.38, 0.38);
-		scoreBoxYearly = createScorePane("Top " + LocalDate.now().getYear(),
+		scoreBoxDaily = createScorePane("Dag Top 10", 0.01, 0.01, 0.38, 0.38);
+		scoreBoxWeekly = createScorePane("Week Top 10", 0.01, 0.61, 0.38, 0.38);
+		scoreBoxMonthly = createScorePane("Maand Top 10", 0.61, 0.01, 0.38, 0.38);
+		scoreBoxYearly = createScorePane("Jaar Top 10 (" + LocalDate.now().getYear() + ")",
 				0.61, 0.61, 0.38, 0.38);
 
 		scorePanes = Arrays.asList(scoreBoxDaily, scoreBoxWeekly, scoreBoxMonthly, scoreBoxYearly);
 
 		Image qrImage = new Image("/qr_dummy.jpg", true);
 		ImageView qrImageView = new ImageView(qrImage);
-		qrImageView.setFitWidth(QR_IMAGE_SIZE);
-		qrImageView.setFitHeight(QR_IMAGE_SIZE);
-		qrImageView.layoutXProperty().bind(widthProperty().divide(2).subtract(QR_IMAGE_SIZE/2));
-		qrImageView.layoutYProperty().bind(heightProperty().subtract(QR_IMAGE_SIZE));
+		qrImageView.fitWidthProperty().bind(Bindings.min(scoreBoxYearly.layoutXProperty().subtract(scoreBoxWeekly
+				.layoutXProperty().add(scoreBoxWeekly.widthProperty())).subtract(10),
+				scoreBoxWeekly.heightProperty().subtract(20)));
+		qrImageView.fitHeightProperty().bind(qrImageView.fitWidthProperty());
+		qrImageView.layoutXProperty().bind(widthProperty().divide(2).subtract(qrImageView.fitWidthProperty()
+				.divide(2)));
+		qrImageView.layoutYProperty().bind(heightProperty().subtract(qrImageView.fitHeightProperty()).subtract(10));
 
 		new AnimationTimer() {
 			@Override
@@ -97,7 +101,6 @@ public class AnacondaGame extends GamePane {
 					System.out.println("Update scores...");
 					updateScores();
 				}
-				System.out.println(qrImageView.getFitWidth());
 			}
 		}.start();
 
@@ -129,16 +132,16 @@ public class AnacondaGame extends GamePane {
 				System.out.println(scores);
 
 				setScoresInPane(scoreBoxDaily, scores.stream().sorted().filter(s -> s.getTime()
-						.isAfter(LocalDate.now().atStartOfDay())).collect(Collectors.toList()));
+						.isAfter(LocalDate.now().atStartOfDay())).limit(10).collect(Collectors.toList()));
 
 				setScoresInPane(scoreBoxWeekly, scores.stream().sorted().filter(s -> s.getTime()
-						.isAfter(LocalDate.now().minusWeeks(1).atStartOfDay())).collect(Collectors.toList()));
+						.isAfter(LocalDate.now().minusWeeks(1).atStartOfDay())).limit(10).collect(Collectors.toList()));
 
 				setScoresInPane(scoreBoxMonthly, scores.stream().sorted().filter(s -> s.getTime()
-						.isAfter(LocalDate.now().minusMonths(1).atStartOfDay())).collect(Collectors.toList()));
+						.isAfter(LocalDate.now().minusMonths(1).atStartOfDay())).limit(10).collect(Collectors.toList()));
 
 				setScoresInPane(scoreBoxYearly, scores.stream().sorted().filter(s -> s.getTime()
-						.isAfter(LocalDate.now().minusYears(1).atStartOfDay())).collect(Collectors.toList()));
+						.isAfter(LocalDate.now().minusYears(1).atStartOfDay())).limit(10).collect(Collectors.toList()));
 
 				progressFade.setFromValue(1);
 				progressFade.setToValue(0);

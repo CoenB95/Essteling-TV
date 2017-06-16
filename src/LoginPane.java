@@ -57,6 +57,10 @@ public class LoginPane extends Pane {
 			this.game = game;
 		}
 
+		public String getAttractionName() {
+			return name;
+		}
+
 		public Pane getGamePane() {
 			try {
 				return game.newInstance();

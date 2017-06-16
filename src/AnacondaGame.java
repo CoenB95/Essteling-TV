@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 /**
  * @author Coen Boelhouwers
  */
-public class AnacondaGame extends GamePane {
+public class AnacondaGame extends GamePane implements EsstelingDatabase.DatabaseListener {
 
 	private static final double UPDATE_INTERVAL = 30;//seconds
 	private static final double QR_IMAGE_SIZE = 200;//pixels
@@ -82,6 +82,8 @@ public class AnacondaGame extends GamePane {
 
 		scorePanes = Arrays.asList(scoreBoxDaily, scoreBoxWeekly, scoreBoxMonthly, scoreBoxYearly);
 
+		EsstelingDatabase.addListener(this);
+
 		Image qrImage = new Image("/qr_dummy.jpg", true);
 		ImageView qrImageView = new ImageView(qrImage);
 		qrImageView.fitWidthProperty().bind(Bindings.min(scoreBoxYearly.layoutXProperty().subtract(scoreBoxWeekly
@@ -91,18 +93,6 @@ public class AnacondaGame extends GamePane {
 		qrImageView.layoutXProperty().bind(widthProperty().divide(2).subtract(qrImageView.fitWidthProperty()
 				.divide(2)));
 		qrImageView.layoutYProperty().bind(heightProperty().subtract(qrImageView.fitHeightProperty()).subtract(10));
-
-		new AnimationTimer() {
-			@Override
-			public void handle(long now) {
-				double elapsedTime = (now - lastUpdate) / 1_000_000.0 / 1_000.0;
-				if (elapsedTime > UPDATE_INTERVAL) {
-					lastUpdate = now;
-					System.out.println("Update scores...");
-					updateScores();
-				}
-			}
-		}.start();
 
 		setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
 		getChildren().addAll(backgroundImageView, qrImageView, scoreLabel);
@@ -121,36 +111,22 @@ public class AnacondaGame extends GamePane {
 		return pane;
 	}
 
-	private void updateScores() {
-		progressFade.setFromValue(0);
-		progressFade.setToValue(1);
-		progressFade.playFromStart();
+	/*private void updateScores() {
+
 		CompletableFuture.runAsync(() -> {
 			try {
 				EsstelingDatabase database = new EsstelingDatabase(getAttractionName());
 				List<Score> scores = database.fetchScoresAfter(LocalDate.now().minusYears(1));
 				System.out.println(scores);
 
-				setScoresInPane(scoreBoxDaily, scores.stream().sorted().filter(s -> s.getTime()
-						.isAfter(LocalDate.now().atStartOfDay())).limit(10).collect(Collectors.toList()));
 
-				setScoresInPane(scoreBoxWeekly, scores.stream().sorted().filter(s -> s.getTime()
-						.isAfter(LocalDate.now().minusWeeks(1).atStartOfDay())).limit(10).collect(Collectors.toList()));
 
-				setScoresInPane(scoreBoxMonthly, scores.stream().sorted().filter(s -> s.getTime()
-						.isAfter(LocalDate.now().minusMonths(1).atStartOfDay())).limit(10).collect(Collectors.toList()));
 
-				setScoresInPane(scoreBoxYearly, scores.stream().sorted().filter(s -> s.getTime()
-						.isAfter(LocalDate.now().minusYears(1).atStartOfDay())).limit(10).collect(Collectors.toList()));
-
-				progressFade.setFromValue(1);
-				progressFade.setToValue(0);
-				progressFade.playFromStart();
 			} catch (SQLException | ClassNotFoundException e) {
 				e.printStackTrace();
 			}
 		});
-	}
+	}*/
 
 	private void setScoresInPane(ScorePane pane, List<Score> scores) {
 		pane.clearScores();
@@ -158,5 +134,31 @@ public class AnacondaGame extends GamePane {
 			Score score = scores.get(i);
 			pane.addScore(score);
 		}
+	}
+
+	@Override
+	public void onDatabaseRefreshStart() {
+		progressFade.setFromValue(0);
+		progressFade.setToValue(1);
+		progressFade.playFromStart();
+	}
+
+	@Override
+	public void onDatabaseRefreshed(boolean success, List<Score> scores) {
+		setScoresInPane(scoreBoxDaily, scores.stream().sorted().filter(s -> s.getTime()
+				.isAfter(LocalDate.now().atStartOfDay())).limit(10).collect(Collectors.toList()));
+
+		setScoresInPane(scoreBoxWeekly, scores.stream().sorted().filter(s -> s.getTime()
+				.isAfter(LocalDate.now().minusWeeks(1).atStartOfDay())).limit(10).collect(Collectors.toList()));
+
+		setScoresInPane(scoreBoxMonthly, scores.stream().sorted().filter(s -> s.getTime()
+				.isAfter(LocalDate.now().minusMonths(1).atStartOfDay())).limit(10).collect(Collectors.toList()));
+
+		setScoresInPane(scoreBoxYearly, scores.stream().sorted().filter(s -> s.getTime()
+				.isAfter(LocalDate.now().minusYears(1).atStartOfDay())).limit(10).collect(Collectors.toList()));
+
+		progressFade.setFromValue(1);
+		progressFade.setToValue(0);
+		progressFade.playFromStart();
 	}
 }

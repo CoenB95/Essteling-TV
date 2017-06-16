@@ -13,12 +13,15 @@ public class Main extends Application implements LoginPane.OnAttractionSelectedL
 		EventHandler<KeyEvent> {
 
 	private Stage primaryStage;
+	private EsstelingDatabase database;
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		this.primaryStage = primaryStage;
 		Font.loadFont(getClass().getResourceAsStream("/Roboto-Regular.ttf"), 100);
 		Font.loadFont(getClass().getResourceAsStream("/Roboto-Thin.ttf"), 100);
+
+		database = new EsstelingDatabase();
 
 		Scene mainScene = LoginPane.newScene(this);
 		mainScene.setOnKeyPressed(this);
@@ -33,20 +36,27 @@ public class Main extends Application implements LoginPane.OnAttractionSelectedL
 	@Override
 	public void onAttractionSelected(LoginPane.AttractionItem item) {
 		primaryStage.getScene().setRoot(item.getGamePane());
+		EsstelingDatabase.changeAttraction(item.getAttractionName());
 	}
 
 	@Override
 	public void handle(KeyEvent event) {
-		boolean wasFullscreen = primaryStage.isFullScreen();
 		if (event.getCode() == KeyCode.F11) {
 			primaryStage.setFullScreen(!primaryStage.isFullScreen());
 			event.consume();
 		} else if (event.getCode() == KeyCode.E) {
+			database.refreshNow();
 			primaryStage.getScene().setRoot(new EndOfDayPane());
 			event.consume();
 		} else if (event.getCode() == KeyCode.Q) {
 			primaryStage.getScene().setRoot(new LoginPane(this));
 			event.consume();
 		}
+	}
+
+	@Override
+	public void stop() throws Exception {
+		super.stop();
+		database.stop();
 	}
 }

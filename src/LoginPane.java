@@ -57,9 +57,9 @@ public class LoginPane extends Pane {
 			this.game = game;
 		}
 
-		public Scene getGameScene() {
+		public Pane getGamePane() {
 			try {
-				return new Scene(game.newInstance(), 900, 500);
+				return game.newInstance();
 			} catch (InstantiationException | IllegalAccessException e) {
 				e.printStackTrace();
 			}

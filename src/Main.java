@@ -1,13 +1,16 @@
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 /**
  * @author Coen Boelhouwers
  */
-public class Main extends Application implements LoginPane.OnAttractionSelectedListener {
+public class Main extends Application implements LoginPane.OnAttractionSelectedListener,
+		EventHandler<KeyEvent> {
 
 	private Stage primaryStage;
 
@@ -17,7 +20,9 @@ public class Main extends Application implements LoginPane.OnAttractionSelectedL
 		Font.loadFont(getClass().getResourceAsStream("/Roboto-Regular.ttf"), 100);
 		Font.loadFont(getClass().getResourceAsStream("/Roboto-Thin.ttf"), 100);
 
-		primaryStage.setScene(LoginPane.newScene(this));
+		Scene mainScene = LoginPane.newScene(this);
+		mainScene.setOnKeyPressed(this);
+		primaryStage.setScene(mainScene);
 		primaryStage.show();
 	}
 
@@ -27,17 +32,21 @@ public class Main extends Application implements LoginPane.OnAttractionSelectedL
 
 	@Override
 	public void onAttractionSelected(LoginPane.AttractionItem item) {
-		Scene scene = item.getGameScene();
-		scene.setOnKeyPressed(event -> {
-			if (event.getCode().equals(KeyCode.F11)) {
-				primaryStage.setFullScreen(!primaryStage.isFullScreen());
-				event.consume();
-			} else if (event.getCode().equals(KeyCode.Q)) {
-				scene.setOnKeyPressed(null);
-				primaryStage.setScene(LoginPane.newScene(this));
-				event.consume();
-			}
-		});
-		primaryStage.setScene(scene);
+		primaryStage.getScene().setRoot(item.getGamePane());
+	}
+
+	@Override
+	public void handle(KeyEvent event) {
+		boolean wasFullscreen = primaryStage.isFullScreen();
+		if (event.getCode() == KeyCode.F11) {
+			primaryStage.setFullScreen(!primaryStage.isFullScreen());
+			event.consume();
+		} else if (event.getCode() == KeyCode.E) {
+			primaryStage.getScene().setRoot(new EndOfDayPane());
+			event.consume();
+		} else if (event.getCode() == KeyCode.Q) {
+			primaryStage.getScene().setRoot(new LoginPane(this));
+			event.consume();
+		}
 	}
 }

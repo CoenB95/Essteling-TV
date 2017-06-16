@@ -65,7 +65,7 @@ public class AllScoresPane extends Pane implements EsstelingDatabase.DatabaseLis
 
 		EsstelingDatabase.addListener(this);
 
-		Image qrImage = new Image("/qr_dummy.jpg", true);
+		Image qrImage = new Image("/qr_code.jpg", true);
 		ImageView qrImageView = new ImageView(qrImage);
 		qrImageView.fitWidthProperty().bind(Bindings.min(scoreBoxYearly.layoutXProperty().subtract(scoreBoxWeekly
 				.layoutXProperty().add(scoreBoxWeekly.widthProperty())).subtract(10),

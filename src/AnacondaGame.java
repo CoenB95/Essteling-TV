@@ -73,11 +73,11 @@ public class AnacondaGame extends GamePane {
 
 		progressFade = new FadeTransition(Duration.millis(400), progressBar);
 
-		scoreBoxDaily = createScorePane("Top dag:", 0, 0, 0.4, 0.4);
-		scoreBoxWeekly = createScorePane("Top week:", 0, 0.6, 0.4, 0.4);
-		scoreBoxMonthly = createScorePane("Top maand:", 0.6, 0, 0.4, 0.4);
+		scoreBoxDaily = createScorePane("Top dag:", 0.01, 0.01, 0.38, 0.38);
+		scoreBoxWeekly = createScorePane("Top week:", 0.01, 0.61, 0.38, 0.38);
+		scoreBoxMonthly = createScorePane("Top maand:", 0.61, 0.01, 0.38, 0.38);
 		scoreBoxYearly = createScorePane("Top " + LocalDate.now().getYear(),
-				0.6, 0.6, 0.4, 0.4);
+				0.61, 0.61, 0.38, 0.38);
 
 		scorePanes = Arrays.asList(scoreBoxDaily, scoreBoxWeekly, scoreBoxMonthly, scoreBoxYearly);
 

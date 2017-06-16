@@ -13,6 +13,7 @@ public class Main extends Application implements LoginPane.OnAttractionSelectedL
 		EventHandler<KeyEvent> {
 
 	private Stage primaryStage;
+	private MainScene mainScene;
 	private EsstelingDatabase database;
 
 	@Override
@@ -24,7 +25,8 @@ public class Main extends Application implements LoginPane.OnAttractionSelectedL
 
 		database = new EsstelingDatabase();
 
-		Scene mainScene = LoginPane.newScene(this);
+		mainScene = new MainScene();
+		mainScene.changePane(new LoginPane(this));
 		mainScene.setOnKeyPressed(this);
 		primaryStage.setScene(mainScene);
 		primaryStage.show();
@@ -36,8 +38,9 @@ public class Main extends Application implements LoginPane.OnAttractionSelectedL
 
 	@Override
 	public void onAttractionSelected(LoginPane.AttractionItem item) {
-		primaryStage.getScene().setRoot(item.getGamePane());
+		mainScene.changePane(item.getGamePane());
 		EsstelingDatabase.changeAttraction(item.getAttractionName());
+		database.refreshNow();
 	}
 
 	@Override
@@ -47,10 +50,10 @@ public class Main extends Application implements LoginPane.OnAttractionSelectedL
 			event.consume();
 		} else if (event.getCode() == KeyCode.E) {
 			database.refreshNow();
-			primaryStage.getScene().setRoot(new EndOfDayPane());
+			mainScene.changePane(new EndOfDayPane());
 			event.consume();
 		} else if (event.getCode() == KeyCode.Q) {
-			primaryStage.getScene().setRoot(new LoginPane(this));
+			mainScene.changePane(new LoginPane(this));
 			event.consume();
 		}
 	}

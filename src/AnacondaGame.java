@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 public class AnacondaGame extends GamePane {
 
 	private static final double UPDATE_INTERVAL = 30;//seconds
+	private static final double QR_IMAGE_SIZE = 200;//pixels
 
 	private long lastUpdate = -1;
 	private Font monoFont = Font.font("monospaced", 40);
@@ -38,28 +39,28 @@ public class AnacondaGame extends GamePane {
 	public AnacondaGame() {
 		super("Araconda");
 
-		Image image = new Image("/snake_background2.png", true);
-		ImageView imageView = new ImageView(image);
-		imageView.setCache(true);
+		Image backgroundImage = new Image("/snake_background2.png", true);
+		ImageView backgroundImageView = new ImageView(backgroundImage);
+		backgroundImageView.setCache(true);
 
-		FadeTransition ft = new FadeTransition(Duration.millis(400), imageView);
+		FadeTransition ft = new FadeTransition(Duration.millis(400), backgroundImageView);
 		ft.setFromValue(0);
 		ft.setToValue(1);
 
-		TranslateTransition tt = new TranslateTransition(Duration.seconds(10), imageView);
+		TranslateTransition tt = new TranslateTransition(Duration.seconds(10), backgroundImageView);
 		tt.setAutoReverse(true);
 		tt.setCycleCount(TranslateTransition.INDEFINITE);
 		//Wait for the image to finish loading
-		image.widthProperty().addListener((v1, v2, v3) -> {
+		backgroundImage.widthProperty().addListener((v1, v2, v3) -> {
 			System.out.println("Image loaded");
 			tt.setFromX(0);
-			tt.toXProperty().bind(widthProperty().subtract(image.widthProperty()));
+			tt.toXProperty().bind(widthProperty().subtract(backgroundImage.widthProperty()));
 			ft.playFromStart();
 			tt.playFromStart();
 		});
 		widthProperty().addListener((v1, v2, v3) -> tt.playFromStart());
 
-		Label scoreLabel = new Label(getAttractionName());
+		Label scoreLabel = new Label("Anaconda");
 		scoreLabel.setFont(Font.font("Roboto Thin", 100));
 		scoreLabel.setTextFill(Color.WHITE);
 		scoreLabel.layoutXProperty().bind(widthProperty().divide(2).subtract(scoreLabel.widthProperty().divide(2)));
@@ -80,6 +81,13 @@ public class AnacondaGame extends GamePane {
 
 		scorePanes = Arrays.asList(scoreBoxDaily, scoreBoxWeekly, scoreBoxMonthly, scoreBoxYearly);
 
+		Image qrImage = new Image("/qr_dummy.jpg", true);
+		ImageView qrImageView = new ImageView(qrImage);
+		qrImageView.setFitWidth(QR_IMAGE_SIZE);
+		qrImageView.setFitHeight(QR_IMAGE_SIZE);
+		qrImageView.layoutXProperty().bind(widthProperty().divide(2).subtract(QR_IMAGE_SIZE/2));
+		qrImageView.layoutYProperty().bind(heightProperty().subtract(QR_IMAGE_SIZE));
+
 		new AnimationTimer() {
 			@Override
 			public void handle(long now) {
@@ -89,11 +97,12 @@ public class AnacondaGame extends GamePane {
 					System.out.println("Update scores...");
 					updateScores();
 				}
+				System.out.println(qrImageView.getFitWidth());
 			}
 		}.start();
 
 		setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
-		getChildren().addAll(imageView, scoreLabel);
+		getChildren().addAll(backgroundImageView, qrImageView, scoreLabel);
 		getChildren().addAll(scorePanes);
 		getChildren().add(progressBar);
 	}

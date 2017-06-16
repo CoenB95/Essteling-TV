@@ -1,3 +1,5 @@
+import games.AnacondaGame;
+import games.GamePane;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
@@ -61,7 +63,7 @@ public class LoginPane extends Pane {
 			return name;
 		}
 
-		public Pane getGamePane() {
+		public GamePane getGamePane() {
 			try {
 				return game.newInstance();
 			} catch (InstantiationException | IllegalAccessException e) {

@@ -1,29 +1,26 @@
-import javafx.animation.AnimationTimer;
+import games.GamePane;
 import javafx.animation.FadeTransition;
-import javafx.animation.TranslateTransition;
 import javafx.beans.binding.Bindings;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
  * @author Coen Boelhouwers
  */
-public class AnacondaGame extends GamePane implements EsstelingDatabase.DatabaseListener {
+public class AllScoresPane extends Pane implements EsstelingDatabase.DatabaseListener {
 
 	private static final double UPDATE_INTERVAL = 30;//seconds
 	private static final double QR_IMAGE_SIZE = 200;//pixels
@@ -37,14 +34,15 @@ public class AnacondaGame extends GamePane implements EsstelingDatabase.Database
 	private ScorePane scoreBoxMonthly;
 	private ScorePane scoreBoxYearly;
 
-	public AnacondaGame() {
-		super("Anaconda");
+	public AllScoresPane(GamePane game) {
+		game.prefWidthProperty().bind(widthProperty());
+		game.prefHeightProperty().bind(heightProperty());
 
 		DynamicBackgroundPane backgroundImageView = new DynamicBackgroundPane();
 		backgroundImageView.prefWidthProperty().bind(widthProperty());
 		backgroundImageView.prefHeightProperty().bind(heightProperty());
 
-		Label scoreLabel = new Label(getAttractionName());
+		Label scoreLabel = new Label(game.getAttractionName());
 		scoreLabel.setFont(Font.font("Roboto Thin", 100));
 		scoreLabel.setTextFill(Color.WHITE);
 		scoreLabel.layoutXProperty().bind(widthProperty().divide(2).subtract(scoreLabel.widthProperty().divide(2)));
@@ -78,7 +76,7 @@ public class AnacondaGame extends GamePane implements EsstelingDatabase.Database
 		qrImageView.layoutYProperty().bind(heightProperty().subtract(qrImageView.fitHeightProperty()).subtract(10));
 
 		setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
-		getChildren().addAll(backgroundImageView, qrImageView, scoreLabel);
+		getChildren().addAll(backgroundImageView, game, qrImageView, scoreLabel);
 		getChildren().addAll(scorePanes);
 		getChildren().add(progressBar);
 	}

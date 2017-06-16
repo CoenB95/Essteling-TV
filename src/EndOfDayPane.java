@@ -1,26 +1,17 @@
 import javafx.animation.AnimationTimer;
 import javafx.animation.FadeTransition;
-import javafx.animation.TranslateTransition;
 import javafx.beans.binding.Bindings;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Coen Boelhouwers
@@ -65,7 +56,7 @@ public class EndOfDayPane extends Pane implements EsstelingDatabase.DatabaseList
 				label3.layoutYProperty()).subtract(label1.heightProperty()));
 		label1.maxWidthProperty().bind(widthProperty().multiply(0.48));
 
-		Label label4 = new Label("Dag winnaar " + EsstelingDatabase.getCurrentAttractionName());
+		Label label4 = new Label("Dagwinnaar " + EsstelingDatabase.getCurrentAttractionName());
 		label4.setFont(Font.font("Roboto Thin", 60));
 		label4.setTextFill(Color.WHITE);
 		label4.setWrapText(true);
@@ -107,12 +98,20 @@ public class EndOfDayPane extends Pane implements EsstelingDatabase.DatabaseList
 	@Override
 	public void onDatabaseRefreshed(boolean success, List<Score> allScores) {
 		if (success) {
+			final AtomicInteger topScore = new AtomicInteger(-1);
+			StringBuilder builder = new StringBuilder();
 			allScores.stream()
-					.sorted()
 					.filter(s -> s.getTime().isAfter(LocalDate.now().atStartOfDay()))
-					.findFirst()
-					.ifPresent(s -> topScoreLabel.setText(s.getName() + "\nScore: " + s.getScore() +
-							"\nom " + s.getTime().format(DateTimeFormatter.ofPattern("H:mm"))));
+					.sorted()
+					.forEach(s -> {
+						if (topScore.get() < 0) {
+							builder.append(s.getName());
+							topScore.set(s.getScore());
+						}
+						else if (s.getScore() == topScore.get()) builder.append(", ").append(s.getName());
+					});
+			builder.append("\nScore: ").append(topScore.get());
+			topScoreLabel.setText(builder.toString());
 		}
 	}
 }

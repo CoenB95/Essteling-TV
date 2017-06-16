@@ -20,6 +20,7 @@ public class Main extends Application implements LoginPane.OnAttractionSelectedL
 		this.primaryStage = primaryStage;
 		Font.loadFont(getClass().getResourceAsStream("/Roboto-Regular.ttf"), 100);
 		Font.loadFont(getClass().getResourceAsStream("/Roboto-Thin.ttf"), 100);
+		Font.loadFont(getClass().getResourceAsStream("/Roboto-Medium.ttf"), 100);
 
 		database = new EsstelingDatabase();
 

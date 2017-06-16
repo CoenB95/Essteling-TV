@@ -40,26 +40,9 @@ public class AnacondaGame extends GamePane implements EsstelingDatabase.Database
 	public AnacondaGame() {
 		super("Anaconda");
 
-		Image backgroundImage = new Image("/snake_background2.png", true);
-		ImageView backgroundImageView = new ImageView(backgroundImage);
-		backgroundImageView.setCache(true);
-
-		FadeTransition ft = new FadeTransition(Duration.millis(400), backgroundImageView);
-		ft.setFromValue(0);
-		ft.setToValue(1);
-
-		TranslateTransition tt = new TranslateTransition(Duration.seconds(10), backgroundImageView);
-		tt.setAutoReverse(true);
-		tt.setCycleCount(TranslateTransition.INDEFINITE);
-		//Wait for the image to finish loading
-		backgroundImage.widthProperty().addListener((v1, v2, v3) -> {
-			System.out.println("Image loaded");
-			tt.setFromX(0);
-			tt.toXProperty().bind(widthProperty().subtract(backgroundImage.widthProperty()));
-			ft.playFromStart();
-			tt.playFromStart();
-		});
-		widthProperty().addListener((v1, v2, v3) -> tt.playFromStart());
+		DynamicBackgroundPane backgroundImageView = new DynamicBackgroundPane();
+		backgroundImageView.prefWidthProperty().bind(widthProperty());
+		backgroundImageView.prefHeightProperty().bind(heightProperty());
 
 		Label scoreLabel = new Label(getAttractionName());
 		scoreLabel.setFont(Font.font("Roboto Thin", 100));

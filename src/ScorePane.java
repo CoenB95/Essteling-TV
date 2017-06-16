@@ -59,7 +59,7 @@ public class ScorePane extends Pane {
 
 		prefWidthProperty().bind(Bindings.max(scoreLabel.widthProperty(), scoreBox.widthProperty()));
 		prefHeightProperty().bind(scoreLabel.heightProperty().add(scoreBox.heightProperty()));
-		setBackground(new Background(new BackgroundFill(new Color(1, 1, 1, 0.4),
+		setBackground(new Background(new BackgroundFill(new Color(1, 1, 1, 0.7),
 				null, null)));
 		setClip(scoreBoxClip);
 		getChildren().addAll(scoreBox, scoreLabel);
